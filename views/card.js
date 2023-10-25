@@ -1,35 +1,41 @@
-const stripe = Stripe('pk_test_...');
+const stripe = Stripe('pk_test_');
 const elements = stripe.elements();
 
-// Create our card inputs
-var style = {
-    base: {
-        color: "#fff"
-    }
-};
+const cardElement = elements.create('card');
+cardElement.mount('#card-element');
 
-const card = elements.create('card', { style });
-card.mount('#card-element');
-
-const form = document.querySelector('form');
-const errorEl = document.querySelector('#card-errors');
-
-// Give our token to our form
-const stripeTokenHandler = token => {
-    const hiddenInput = document.createElement('input');
-    hiddenInput.setAttribute('type', 'hidden');
-    hiddenInput.setAttribute('name', 'stripeToken');
-    hiddenInput.setAttribute('value', token.id);
-    form.appendChild(hiddenInput);
-    form.submit();
-}
-
-// Create token from card data
-form.addEventListener('submit', e => {
+const form = document.getElementById('payment-form');
+const errorMessage = document.getElementById('error-message');
+const successMessage = document.getElementById('success-message');
+form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    stripe.createToken(card).then(res => {
-        if (res.error) errorEl.textContent = res.error.message;
-        else stripeTokenHandler(res.token);
-    })
-})
+    const amount = parseFloat(form.querySelector('input[name="amount"]').value);
+
+    const response = await fetch('/create-payment-intent', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            amount: 12,
+            name: "kanhu",
+            email: "test@test.com"
+        }),
+    });
+
+
+    const { clientSecret } = await response.json();
+
+    const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+            card: cardElement,
+        },
+    });
+
+    if (result.error) {
+        errorMessage.textContent = result.error.message;
+    } else {
+        successMessage.textContent = 'Payment successful!';
+    }
+});
