@@ -24,7 +24,7 @@ function initiatePaymentIntent(event) {
   };
 
   // Call the API using fetch()
-  fetch("http://localhost:3004/create-payment-intent", {
+  fetch("http://localhost:3006/create-payment-intent", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
