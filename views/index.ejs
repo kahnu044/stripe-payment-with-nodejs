@@ -14,10 +14,11 @@
 <body>
     <main>
 
-        <div>
+        <form id="payment-details-form">
             <label for="">Enter Amount</label>
             <input type="number" name="amount" id="stripe-amount">
-        </div>
+            <button onclick="initiatePaymentIntent(event)">Click me</button>
+        </form>
 
         <form id="payment-form">
             <div id="link-authentication-element">
