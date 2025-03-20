@@ -67,14 +67,6 @@ label {
     display: block;
 }
 
-a {
-    color: var(--accent-color);
-    font-weight: 900;
-}
-
-small {
-    font-size: .6em;
-}
 
 fieldset,
 input,
@@ -90,14 +82,11 @@ select {
     box-shadow: 0 30px 50px -20px rgb(50 50 93 / 25%), 0 30px 60px -30px rgb(0 0 0 / 30%);
 }
 
-#messages {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New';
-    display: none;
-    /* hide initially, then show once the first message arrives */
-    background-color: #0A253C;
-    color: #00D924;
-    padding: 20px;
-    margin: 20px 0;
-    border-radius: var(--radius);
-    font-size: 0.7em;
+#payment-details-form {
+    display: flex;
+    flex-direction: column;
+}
+
+#payment-details-form input {
+    padding: 7px 0;
 }

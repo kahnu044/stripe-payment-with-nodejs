@@ -4,7 +4,10 @@ const stripe = Stripe(publishableKey, {
   apiVersion: "2020-08-27",
 });
 
-console.log("stripe===>>>", stripe);
+const paymentDetailsForm = document.getElementById("payment-details-form");
+const paymentForm = document.getElementById("payment-form");
+const payNowButton = document.getElementById("paynow");
+const messageContainer = document.getElementById("messages");
 
 function initiatePaymentIntent(event) {
   event.preventDefault();
@@ -46,14 +49,18 @@ function initializeStripe(clientSecret) {
   const paymentElement = elements.create("payment");
   paymentElement.mount("#payment-element");
 
-  // Create and mount the linkAuthentication Element to enable autofilling customer payment details
+  // Create and mount the linkAuthentication element
   const linkAuthenticationElement = elements.create("linkAuthentication");
   linkAuthenticationElement.mount("#link-authentication-element");
 
+  // Show the payment form
+  payNowButton.style.display = "block";
+  paymentDetailsForm.style.display = "none";
+  paymentForm.style.display = "block";
+
   // When the form is submitted...
-  const form = document.getElementById("payment-form");
   let submitted = false;
-  form.addEventListener("submit", async (e) => {
+  paymentForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     // Disable double submission of the form
@@ -61,11 +68,9 @@ function initializeStripe(clientSecret) {
       return;
     }
 
-    form.querySelector("button").disabled = true;
+    payNowButton.disabled = true;
 
-    const nameInput = document.querySelector("#name");
-
-    // Confirm the payment given the clientSecret
+    // Confirm the payment with the given clientSecret
     const { error: stripeError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -74,6 +79,8 @@ function initializeStripe(clientSecret) {
     });
 
     if (stripeError) {
+      messageContainer.innerHTML = stripeError.message;
+      messageContainer.style.display = "block";
       console.log(stripeError.message);
       return;
     }
