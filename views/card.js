@@ -74,7 +74,7 @@ function initializeStripe(clientSecret) {
     const { error: stripeError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/thank-you.html`,
+        return_url: `${window.location.origin}/thank-you.ejs`,
       },
     });
 
