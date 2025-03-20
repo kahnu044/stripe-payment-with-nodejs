@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank You</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="card.js" defer></script>
+</head>
+
+<body>
+  <h1>Thank you for your payment!</h1>
+  <p id="payment-status">Loading payment status...</p>
+</body>
+
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", function () {
+    checkPaymentStatus();
+  });
+</script>
+
+</html>

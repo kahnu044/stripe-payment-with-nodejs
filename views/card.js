@@ -1,5 +1,4 @@
-const publishableKey =
-  "pk_test_your_key";
+const publishableKey = "pk_test_51KW0U6SEKNzBqiq5oMLI9ZOKfPxRwKnbjhjsBFS7mHfGymEfCJyl3lXmO3ukKwKSgjkkfndMowYjkovat7CZSmnH00TiPDYjJe";
 const stripe = Stripe(publishableKey, {
   apiVersion: "2020-08-27",
 });
@@ -74,7 +73,7 @@ function initializeStripe(clientSecret) {
     const { error: stripeError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/thank-you.ejs`,
+        return_url: `${window.location.origin}/thank-you.html`,
       },
     });
 
@@ -85,4 +84,51 @@ function initializeStripe(clientSecret) {
       return;
     }
   });
+}
+
+function checkPaymentStatus() {
+
+  // Function to get the query parameter from the URL
+  function getQueryParam(param) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(param);
+  }
+
+  // Extract the client_secret from the URL
+  const clientSecret = getQueryParam("payment_intent_client_secret");
+
+  if (clientSecret) {
+    // Retrieve the Payment Intent using the client_secret
+    stripe
+      .retrievePaymentIntent(clientSecret)
+      .then(({ paymentIntent }) => {
+        const paymentStatusElement = document.getElementById("payment-status");
+
+        switch (paymentIntent.status) {
+          case "succeeded":
+            paymentStatusElement.textContent = "Payment succeeded!";
+            break;
+          case "processing":
+            paymentStatusElement.textContent =
+              "Payment processing. We'll update you once the payment is complete.";
+            break;
+          case "requires_payment_method":
+            paymentStatusElement.textContent =
+              "Payment failed. Please try again with a different payment method.";
+            break;
+          default:
+            paymentStatusElement.textContent =
+              "Something went wrong with your payment. Please contact support.";
+            break;
+        }
+      })
+      .catch((error) => {
+        console.error("Error retrieving payment intent:", error);
+        document.getElementById("payment-status").textContent =
+          "Error retrieving payment status.";
+      });
+  } else {
+    document.getElementById("payment-status").textContent =
+      "No payment information found.";
+  }
 }
