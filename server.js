@@ -34,17 +34,15 @@ app.post("/create-payment-intent", async (req, res) => {
       .then(async (customer) => {
         console.log("Customer ID:", customer.id);
 
-
-          const paymentIntent = await stripe.paymentIntents.create({
-            amount: amount * 100,
-            currency: "inr",
-            payment_method_types: ["card"],
-            receipt_email: email,
-            description: `Payment for ${name} (${email})`,
-            customer: customer.id,
-          });
-          return res.send({ clientSecret: paymentIntent.client_secret });
-
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: amount * 100,
+          currency: "inr",
+          payment_method_types: ["card"],
+          receipt_email: email,
+          description: `Payment for ${name} (${email})`,
+          customer: customer.id,
+        });
+        return res.send({ clientSecret: paymentIntent.client_secret });
       })
       .catch((error) => {
         console.error("Error creating customer:", error);
@@ -56,6 +54,15 @@ app.post("/create-payment-intent", async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
+});
+
+// Handle events by webhook
+app.post("/webhook", express.raw({ type: "application/json" }), (req, res) => {
+  const event = req.body;
+  console.log("received event", event);
+
+  // Return a response to acknowledge receipt of the event
+  res.json({ received: true });
 });
 
 app.listen(PORT, () => console.log("Server is running...", PORT));
