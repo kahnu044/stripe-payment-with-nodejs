@@ -10,12 +10,35 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 // render views
 app.set("view engine", "ejs");
 
-// parses incoming requests with URL-encoded payloads and json body data
+// parses incoming requests with URL-encoded payloads
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 
 // it used for serving HTML, CSS, and JavaScript files
 app.use(express.static(path.join(__dirname, "views")));
+
+// Handle events by webhook
+app.post("/webhook", express.raw({ type: "application/json" }), (req, res) => {
+  const sig = req.headers["stripe-signature"];
+  const endpointSecret = "whsec_.....";
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+  } catch (err) {
+    console.log("failed", err.message);
+    res.status(400).send(`Webhook Error: ${err.message}`);
+    return;
+  }
+
+  console.log("received event", event);
+
+  // Return a response to acknowledge receipt of the event
+  res.json({ received: true });
+});
+
+// parses incoming data
+app.use(express.json());
 
 app.get("/", (req, res) => {
   res.render("index");
@@ -54,15 +77,6 @@ app.post("/create-payment-intent", async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-});
-
-// Handle events by webhook
-app.post("/webhook", express.raw({ type: "application/json" }), (req, res) => {
-  const event = req.body;
-  console.log("received event", event);
-
-  // Return a response to acknowledge receipt of the event
-  res.json({ received: true });
 });
 
 app.listen(PORT, () => console.log("Server is running...", PORT));
