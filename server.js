@@ -19,6 +19,8 @@ app.use(express.static(path.join(__dirname, "views")));
 // Handle events by webhook
 app.post("/webhook", express.raw({ type: "application/json" }), (req, res) => {
   const sig = req.headers["stripe-signature"];
+
+  // find your endpoint's secret in your webhook settings in the Developer Dashboard
   const endpointSecret = "whsec_.....";
 
   let event;
